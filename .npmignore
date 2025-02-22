@@ -1,0 +1,16 @@
+# Node.js dependencies
+node_modules/
+
+# Compiled output
+dist/
+
+# Environment variables
+.env
+
+# TypeScript config files (not needed in published package)
+tsconfig.json
+tsup.config.ts
+
+# Git-related files (not needed in published package)
+.gitignore
+npm-debug.log*
