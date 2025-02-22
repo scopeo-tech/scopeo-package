@@ -1,11 +1,22 @@
 {
   "name": "scopeo_package",
   "version": "1.0.0",
+  "description": "Scopeo SDK for monitoring Node.js applications.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "prepare": "npm run build",
+    "test": "echo \"No tests yet\""
   },
   "keywords": [
     "scopeo",
@@ -16,7 +27,6 @@
   ],
   "author": "scopeo-tech",
   "license": "MIT",
-  "description": "",
   "devDependencies": {
     "tsup": "^8.3.6",
     "typescript": "^5.7.3"
