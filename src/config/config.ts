@@ -1,5 +1,6 @@
 import { UserConfig } from "../types/types";
 import { logInfo, logError } from "../utils/logger";
+import { getMissingConfigKeys } from "../utils/configValidation";
 
 class ConfigManager {
   private static instance: ConfigManager;
@@ -15,15 +16,16 @@ class ConfigManager {
   }
 
   setConfig(userConfig: UserConfig) {
-    if (!userConfig.apiKey || !userConfig.passKey) {
-      logError("apiKey and passKey are required");
-      throw new Error("apiKey and passKey are required");
+    const missingKeys = getMissingConfigKeys(userConfig);
+    if (missingKeys.length > 0) {
+      logError(`Missing config keys: ${missingKeys.join(", ")}`);
+      throw new Error(`Missing config keys: ${missingKeys.join(", ")}`);
     }
     this.config = userConfig;
     logInfo("Scopeo config set successfully");
   }
 
-  getConfig(): UserConfig {
+  getConfig(): UserConfig | null {
     if (!this.config) {
       logError("Scopeo config is not set");
       throw new Error("Scopeo config is not set");
