@@ -4,3 +4,14 @@ export interface UserConfig {
   host : string
   port : number
 }
+
+export interface ServerStatusBody {
+  status: boolean;
+  apiKey: string;
+  passKey: string;
+}
+
+export interface ServerResponse {
+  status: string;
+  message:string
+}
