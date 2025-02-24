@@ -2,8 +2,11 @@ import * as net from "net";
 import { logInfo, logError } from "../utils/logger";
 import { configManager } from "../config/config";
 import { UserConfig } from "../types/types";
+import { sendServerStatus } from "../utils/serverReq";
+import { ServerStatusBody } from "../types/types";
 
-export async function checkServerStatus(
+
+ async function checkServerStatus(
   host: string,
   port: number,
   timeout: number = 3000
@@ -44,9 +47,17 @@ export function startServerMonitoring(interval: number = 10000): void {
 
     setInterval(async () => {
       const isUp: boolean = await checkServerStatus(host, port);
-      logInfo(`Server ${host}:${port} is ${isUp ? "UP ✅" : "DOWN"}`);
+      logInfo(`Server ${host}:${port} is ${isUp ? "UP" : "DOWN"}`);
 
-      // TODO : Send status to Scopeo
+      if (isUp) {
+        const serverStatusBody: ServerStatusBody = {
+            status: true,
+            apiKey: config.apiKey,
+            passKey: config.passKey,
+        }
+        await sendServerStatus(serverStatusBody);
+    }
+      
     }, interval);
   } catch (error) {
     logError(`Error in server monitoring: ${(error as Error).message}`);
