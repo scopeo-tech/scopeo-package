@@ -1,4 +1,3 @@
-
 import axios from "axios"; 
 import { ServerStatusBody  } from "../types/types";
 import { serverConfig } from "./serverConfig";
@@ -16,16 +15,5 @@ export const sendServerStatus = async (serverStatusBody: ServerStatusBody) => {
         console.log("Error sending server status:", error);
     }
 };
-
-=======
-            "http://localhost:3001/project/status",
-            serverStatusBody
-        );
-        return
-    } catch (error) {
-        console.error("Error sending server status:", error);
-        throw error;
-    }
-}
 
 
