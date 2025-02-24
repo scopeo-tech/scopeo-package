@@ -1,17 +1,19 @@
-import axios from "axios";
+import axios from "axios"; 
 import { ServerStatusBody  } from "../types/types";
+import { serverConfig } from "./serverConfig";
+
 
 
 export const sendServerStatus = async (serverStatusBody: ServerStatusBody) => {
     try {
         await axios.post(
-            "http://localhost:3001/project/status",
-            serverStatusBody
+            serverConfig.base_url + "/project/status",
+            serverStatusBody,
+            { headers: { "Content-Type": "application/json" } } 
         );
-        return
     } catch (error) {
-        console.error("Error sending server status:", error);
-        throw error;
+        console.log("Error sending server status:", error);
     }
-}
+};
+
 
