@@ -2,7 +2,7 @@ import * as net from "net";
 import { logInfo, logError } from "../utils/logger";
 import { configManager } from "../config/config";
 import { UserConfig } from "../types/types";
-import { sendServerStatus } from "../utils/serverReq";
+import { sendServerStatus } from "../utils/serverUtils/serverReq";
 import { ServerStatusBody } from "../types/types";
 
 
@@ -47,8 +47,6 @@ export function startServerMonitoring(interval: number = 10000): void {
 
     setInterval(async () => {
       const isUp: boolean = await checkServerStatus(host, port);
-      logInfo(`Server ${host}:${port} is ${isUp ? "UP" : "DOWN"}`);
-
       if (isUp) {
         const serverStatusBody: ServerStatusBody = {
             status: true,
