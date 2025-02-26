@@ -4,6 +4,7 @@ import { configManager } from "../config/config";
 import { UserConfig } from "../types/types";
 import { sendServerStatus } from "../utils/serverUtils/serverReq";
 import { ServerStatusBody } from "../types/types";
+// import encryptPassKey from "../utils/encryptKey";
 
 
  async function checkServerStatus(
@@ -51,8 +52,9 @@ export function startServerMonitoring(interval: number = 10000): void {
         const serverStatusBody: ServerStatusBody = {
             status: true,
             apiKey: config.apiKey,
-            passKey: config.passKey,
+            passKey: config.passKey
         }
+        // console.log(encryptPassKey(config.passKey))
         await sendServerStatus(serverStatusBody);
     }
       

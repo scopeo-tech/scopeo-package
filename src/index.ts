@@ -10,6 +10,6 @@ const initializeScopeo = () => {
         throw new Error("Scopeo config is not set");
     }
     startServerMonitoring();
-};
+}; 
 
 export default initializeScopeo;
