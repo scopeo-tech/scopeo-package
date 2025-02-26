@@ -5,6 +5,7 @@
     "strictNullChecks": true,
     "target": "ES2022",
     "module": "CommonJS",
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "declaration": true,
     "noEmit": true,
