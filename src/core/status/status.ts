@@ -1,9 +1,9 @@
 import * as net from "net";
-import { logInfo, logError } from "../utils/logger";
-import { configManager } from "../config/config";
-import { UserConfig } from "../types/types";
-import { sendServerStatus } from "../utils/serverUtils/serverReq";
-import { ServerStatusBody } from "../types/types";
+import { logInfo, logError } from "../../utils/logger";
+import { configManager } from "../../config/config";
+import { UserConfig } from "../../types/types";
+import { sendServerStatus } from "./utils/serverReq";
+import { ServerStatusBody } from "../../types/types";
 
 
  async function checkServerStatus(

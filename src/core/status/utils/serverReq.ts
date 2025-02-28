@@ -1,7 +1,7 @@
 import axios  from "axios"; 
-import axiosErrorManager from "./axiosErrorManager";
-import { ServerStatusBody  } from "../../types/types";
-import { serverConfig } from "./serverConfig";
+import axiosErrorManager from "../../../utils/axiosErrorManager";
+import { ServerStatusBody  } from "../../../types/types";
+import { serverConfig } from "../../../utils/serverConfig";
 
 
 
