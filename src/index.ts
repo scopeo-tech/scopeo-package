@@ -3,6 +3,7 @@ export { UserConfig } from "./types/types";
 import { configManager } from "./config/config";
 import { startServerMonitoring } from "./core/status";
 import { logError } from "./utils/logger";
+export {  scopeoErrorHandler } from "./core/error/index";
 
 const initializeScopeo = () => {
     const config= configManager.getConfig();
