@@ -4,6 +4,7 @@ import { configManager } from "./config/config";
 import { startServerMonitoring } from "./core/status";
 import { logError } from "./utils/logger";
 export {  scopeoErrorHandler } from "./core/error/index";
+export {accessMonitor} from "./core/security/index";
 
 const initializeScopeo = () => {
     const config= configManager.getConfig();
