@@ -17,7 +17,7 @@ export const sendErrorToServer = async (
       return;
     }
     const { apiKey, passKey } = config;
-    await axios.post( serverConfig.base_url + "/project/errors",
+    await axios.post( serverConfig.base_url + "/errors",
       {
         statusCode,
         route: req.originalUrl,
