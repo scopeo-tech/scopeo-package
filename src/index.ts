@@ -1,7 +1,7 @@
 export { configManager } from "./config/config";
 export { UserConfig } from "./types/types";
 import { configManager } from "./config/config";
-import { startServerMonitoring } from "./core/status/status";
+import { startServerMonitoring } from "./core/status";
 import { logError } from "./utils/logger";
 
 const initializeScopeo = () => {
