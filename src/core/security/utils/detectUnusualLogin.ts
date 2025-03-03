@@ -1,5 +1,5 @@
-import { failedLogins, successfulLogins } from "./cleanupMemory";
 
+import { failedLogins, successfulLogins } from "./cleanupMemory";
 
 const TIME_WINDOW = 60 * 1000;
 const MAX_DAILY_LOGINS = 5;
@@ -39,4 +39,4 @@ export const detectUnusualLogin = (
   
     return { isUnusual: false, reason: null };
   };
-  
+
