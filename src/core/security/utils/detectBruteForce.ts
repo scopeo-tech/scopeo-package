@@ -12,7 +12,6 @@ export const detectBruteForce = (ip: string, isSuccess: boolean): boolean => {
   const now = Date.now();
   failedLogins[ip] = failedLogins[ip].filter((ts) => now - ts < TIME_WINDOW);
   failedLogins[ip].push(now);
-  console.log(failedLogins);
 
   if (failedLogins[ip].length >= MAX_ATTEMPTS) {
     logWarning(`Brute force detected from IP: ${ip}`);

@@ -19,13 +19,10 @@ export const detectUnusualLogin = (
     );
     successfulLogins[ip].push(now);
   
-    console.log("successfulLogins", successfulLogins);
-    console.log("failedLogins", failedLogins);
-    
     if (failedLogins[ip] && failedLogins[ip].length >= 5) {
       const lastFive = failedLogins[ip].slice(-5);
-      console.log(lastFive);
       if (now - lastFive[0] <= TIME_WINDOW) {
+        failedLogins[ip] = [];
         return {
           isUnusual: true,
           reason: "Rapid consecutive login failures followed by success",
