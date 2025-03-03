@@ -1,5 +1,6 @@
-const failedLogins: Record<string, number[]> = {};
-const successfulLogins: Record<string, number[]> = {};
+
+export const failedLogins: Record<string, number[]> = {};
+export const successfulLogins: Record<string, number[]> = {};
 
 const TIME_WINDOW = 60 * 1000;
 const DAILY_WINDOW = 24 * 60 * 60 * 1000;

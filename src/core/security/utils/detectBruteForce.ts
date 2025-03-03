@@ -1,6 +1,6 @@
 import { logWarning } from "../../../utils/logger";
+import { failedLogins } from "./cleanupMemory";
 
-const failedLogins: Record<string, number[]> = {};
 const MAX_ATTEMPTS = 6;
 const TIME_WINDOW = 60 * 1000;
 

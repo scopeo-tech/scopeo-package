@@ -18,7 +18,7 @@ export interface SecurityStatusBody {
   duration : number;
   isBruteForce : boolean
   isUnusual:boolean
-  unusualReason:string
+  unusualReason:string | null
 }
 
 export interface ServerResponse {
