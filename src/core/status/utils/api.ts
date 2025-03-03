@@ -1,21 +1,27 @@
 import axios  from "axios"; 
-import axiosErrorManager from "../../../utils/axiosErrorManager";
-import { ServerStatusBody  } from "../../../types/types";
+import axiosErrorManager from "../../../utils/handleAxiosError";
+import { pingConfig } from "./config";
 import { serverConfig } from "../../../utils/serverConfig";
 import { logError } from "../../../utils/logger";
+import { configManager } from "../../../config/config";
 
 
 
-export const sendServerStatus = async (serverStatusBody: ServerStatusBody) => {
+export async function sendPing(): Promise<void> {
     try {
-        await axios.post(
-            serverConfig.base_url + "/status",
-            serverStatusBody,
-            { headers: { "Content-Type": "application/json" } } 
-        );
+      const config = configManager.getConfig();
+      if (!config) throw new Error("SDK config not set");
+  
+      await axios.post(`${serverConfig.base_url}/ping`, null, {
+        headers: {
+          "x-api-key": config.apiKey,
+          "x-pass-key": config.passKey,
+        },
+        timeout: pingConfig.timeout,
+      });
     } catch (error) {
-        logError(axiosErrorManager(error));
+      logError(axiosErrorManager(error));
     }
-};
+  }
 
 

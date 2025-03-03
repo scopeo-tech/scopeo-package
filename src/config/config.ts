@@ -1,6 +1,6 @@
 import { UserConfig } from "../types/types";
 import { logInfo, logError } from "../utils/logger";
-import { getMissingConfigKeys } from "../utils/configValidation";
+import { getMissingConfigKeys } from "./configValidation";
 
 class ConfigManager {
   private static instance: ConfigManager;
@@ -15,17 +15,31 @@ class ConfigManager {
     return ConfigManager.instance;
   }
 
-  setConfig(userConfig: UserConfig) {
-    const missingKeys = getMissingConfigKeys(userConfig);
+  setConfig(userConfig: Partial<UserConfig>) {
+    const defaultConfig: UserConfig = {
+      apiKey: "",
+      passKey: "",
+      environment: "production",
+    };
+
+    const mergedConfig: UserConfig = { ...defaultConfig, ...userConfig };
+
+    const missingKeys = getMissingConfigKeys(mergedConfig);
     if (missingKeys.length > 0) {
-      logError(`Missing config keys: ${missingKeys.join(", ")}`);
+      logError(
+        `Invalid config! Provided: ${JSON.stringify(
+          userConfig
+        )} | Missing: ${missingKeys.join(", ")}`
+      );
+
       throw new Error(`Missing config keys: ${missingKeys.join(", ")}`);
     }
-    this.config = userConfig;
+
+    this.config = mergedConfig;
     logInfo("Scopeo config set successfully");
   }
 
-  getConfig(): UserConfig | null {
+  getConfig(): UserConfig {
     if (!this.config) {
       logError("Scopeo config is not set");
       throw new Error("Scopeo config is not set");

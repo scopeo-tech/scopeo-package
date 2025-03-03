@@ -36,7 +36,6 @@
     "@types/express": "^5.0.0",
     "axios": "^1.7.9",
     "express": "^4.21.2",
-    "express-rate-limit": "^7.5.0",
-    "scopeo_package": "file:"
+    "express-rate-limit": "^7.5.0"
   }
 }

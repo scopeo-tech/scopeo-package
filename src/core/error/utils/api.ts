@@ -1,5 +1,5 @@
 import axios from "axios";
-import axiosErrorManager from "../../../utils/axiosErrorManager";
+import axiosErrorManager from "../../../utils/handleAxiosError";
 import { Request } from "express";
 import { serverConfig } from "../../../utils/serverConfig";
 import { configManager } from "../../../config/config";
