@@ -8,8 +8,8 @@ const DAILY_WINDOW = 24 * 60 * 60 * 1000;
 export const detectUnusualLogin = (
   ip: string,
   isSuccess: boolean
-): { isUnusual: boolean; reason: string } => {
-  if (!isSuccess) return { isUnusual: false, reason: "" };
+): { isUnusual: boolean; reason: string | null } => {
+  if (!isSuccess) return { isUnusual: false, reason: null };
 
   const now = Date.now();
 
@@ -37,5 +37,5 @@ export const detectUnusualLogin = (
     };
   }
 
-  return { isUnusual: false, reason: "" };
+  return { isUnusual: false, reason: null };
 };
