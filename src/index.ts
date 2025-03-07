@@ -1,8 +1,9 @@
 export { configManager } from "./config/config";
 export { UserConfig } from "./types/types";
 import { configManager } from "./config/config";
-import { startServerMonitoring } from "./core/status";
+import { pingMonitor } from "./core/status/index";
 import { logError } from "./utils/logger";
+import { cleanUpMemory } from "./core/security/utils/cleanupMemory";
 export {  scopeoErrorHandler } from "./core/error/index";
 export {accessMonitor} from "./core/security/index";
 
@@ -12,7 +13,8 @@ const initializeScopeo = () => {
         logError("Scopeo config is not set");
         throw new Error("Scopeo config is not set");
     }
-    startServerMonitoring();
+    pingMonitor.start();
+    cleanUpMemory();
 };
 
 export default initializeScopeo;

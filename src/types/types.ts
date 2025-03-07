@@ -1,8 +1,7 @@
 export interface UserConfig {
   apiKey: string;
   passKey: string;
-  host : string
-  port : number
+  environment : string
 }
 
 export interface ServerStatusBody {
@@ -16,7 +15,10 @@ export interface SecurityStatusBody {
   isSuccess: boolean;
   ip: string;
   userAgent: string;
-  duration : number
+  duration : number;
+  isBruteForce : boolean
+  isUnusual:boolean
+  unusualReason:string | null
 }
 
 export interface ServerResponse {
