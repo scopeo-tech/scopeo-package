@@ -1,5 +1,6 @@
 import { globalErrorHandler } from "./middleware/errorHandler";
-export const scopeoErrorHandler = (app: any) => {
+import { Application } from 'express';
+export const scopeoErrorHandler = (app: Application) => {
   app.use(globalErrorHandler);
 };
 
