@@ -5,6 +5,7 @@ import { pingMonitor } from "./core/status/index";
 import { logError } from "./utils/logger";
 import { cleanUpMemory } from "./core/security/utils/cleanupMemory";
 export { scopeoErrorHandler } from "./core/error/index";
+export { scopeoMonitor} from './core/perfomance/index';
 export { accessMonitor } from "./core/security/index";
 
 const initializeScopeo = () => {
