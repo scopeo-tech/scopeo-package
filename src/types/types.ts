@@ -21,7 +21,15 @@ export interface SecurityStatusBody {
   unusualReason:string | null
 }
 
-export interface ServerResponse {
-  status: string;
-  message:string
+export interface PerformanceData {
+  latency: number;
+  uptimePercentage: number;
+  responseTime: number;
+  totalRequests: number;
+  failedRequests: number;
+  successRequests: number;
+  errorRate: number;
+  averageRequestsPerSecond: number;
+  peakRequestsPerSecond: number;
+  httpStatusCounts: Record<string, number>;
 }
