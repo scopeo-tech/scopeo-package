@@ -6,18 +6,28 @@ import latencyMonitor from "../metrics/latencyMonitor";
 import requestMonitor from "../metrics/requestMonitor";
 import systemMonitor from "../metrics/systemMonitor";
 import uptimeMonitor from "../metrics/uptimeMonitor";
-import { time, timeStamp } from "console";
 
-export const sendMetricsToServer = async () => {
+declare global {
+  var scopeoSyncInterval: NodeJS.Timeout | undefined;
+}
+
+let lastMetricsSentTime = 0;
+
+export const sendMetricsToServer = async (forceReset = true): Promise<void> => {
   try {
+    const currentTime = Date.now();
+    if (currentTime - lastMetricsSentTime < 55000) {
+      return;
+    }
+    
     const config = configManager.getConfig();
     if (!config) {
       logError("SDK config is missing.");
       return;
     }
-    
-    const latencyData = latencyMonitor.collectLatencyData(0);
-    const requestData = requestMonitor.collectMetrics();
+   
+    const latencyData = latencyMonitor.collectLatencyData(forceReset ? 1 : 0);
+    const requestData = requestMonitor.collectMetrics(forceReset);
     const systemData = await systemMonitor.collectMetrics() || {
       uptime: 0,
       cpuUsage: [],
@@ -26,7 +36,7 @@ export const sendMetricsToServer = async () => {
       loadAverage: [0, 0, 0]
     };
     const uptimeData = uptimeMonitor.collectUptimeData(uptimeMonitor.calculateUptimePercentage());
-
+    
     const diskUsage = systemData.diskUsage || {};
     const completeDiskUsage = {
       total: diskUsage.total || 1,
@@ -34,10 +44,11 @@ export const sendMetricsToServer = async () => {
       free: diskUsage.free || 0,
       usagePercent: diskUsage.total ? (diskUsage.used / diskUsage.total) * 100 : 0,
     };
-    
-
+   
     const payload = {
-      timeStamp: Date.now(),
+      timeStamp: currentTime,
+      batchStartTime: requestData.intervalStart,
+      batchEndTime: currentTime,
       uptimePercentage: uptimeData.uptimePercentage,
       latency: latencyData.latency || 0,
       responseTime: requestData.responseTime || 0,
@@ -60,9 +71,9 @@ export const sendMetricsToServer = async () => {
         },
         diskUsage: completeDiskUsage,
         loadAverage: systemData.loadAverage || [0, 0, 0],
-      } 
+      }
     };
-
+    
     await axios.post(serverConfig.base_url + "/performance", payload, {
       headers: {
         "Content-Type": "application/json",
@@ -70,10 +81,23 @@ export const sendMetricsToServer = async () => {
         "x-pass-key": config.passKey,
       },
     });
-    console.log("Metrics sent to server:", payload);
+    
+    console.log("Metrics batch sent to server:", {
+      timeRange: `${new Date(payload.batchStartTime).toISOString()} to ${new Date(payload.batchEndTime).toISOString()}`,
+      totalRequests: payload.requests.totalRequests,
+      avgResponseTime: payload.responseTime
+    });
+    
+    lastMetricsSentTime = currentTime;
   } catch (error) {
     console.error("Error sending metrics to server:", error);
   }
 };
 
-setInterval(sendMetricsToServer, 60000);
+if (global.scopeoSyncInterval) {
+  clearInterval(global.scopeoSyncInterval);
+}
+
+global.scopeoSyncInterval = setInterval(() => {
+  sendMetricsToServer(true);
+}, 60000);
