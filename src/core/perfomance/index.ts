@@ -19,7 +19,6 @@ export const scopeoMonitor = {
     try {
       latencyMonitor.startMonitoring();
       uptimeMonitor.startMonitoring();
-      systemMonitor
       if (app) {
         requestMonitor.startMonitoring(app);
       }
@@ -29,15 +28,15 @@ export const scopeoMonitor = {
   },
   startWithAutoSync: (app?: Application, interval: number = 60000): void => {
     scopeoMonitor.startAll(app);
-    
+   
     if (global.scopeoSyncInterval) {
       clearInterval(global.scopeoSyncInterval);
     }
-    
+   
     global.scopeoSyncInterval = setInterval(() => {
       sendMetricsToServer(true);
     }, interval);
-    
+   
     console.log(`Metrics will be collected and sent every ${interval/1000} seconds`);
   },
   stopAutoSync: (): void => {
