@@ -32,19 +32,13 @@ export const sendMetricsToServer = async (forceReset = true): Promise<void> => {
       uptime: 0,
       cpuUsage: [],
       memoryUsage: { total: 0, used: 0, free: 0, usagePercent: 0 },
-      diskUsage: { total: 0, used: 0, free: 0, usagePercent: 0 },
+      diskUsage: { disks: [], total: 0, used: 0, free: 0, usagePercent: 0 },
       loadAverage: [0, 0, 0]
     };
     const uptimeData = uptimeMonitor.collectUptimeData(uptimeMonitor.calculateUptimePercentage());
     
-    const diskUsage = systemData.diskUsage || {};
-    const completeDiskUsage = {
-      total: diskUsage.total || 1,
-      used: diskUsage.used || 0,
-      free: diskUsage.free || 0,
-      usagePercent: diskUsage.total ? (diskUsage.used / diskUsage.total) * 100 : 0,
-    };
-   
+    const diskUsage = systemData.diskUsage || { disks: [], total: 0, used: 0, free: 0, usagePercent: 0 };
+    
     const payload = {
       timeStamp: currentTime,
       batchStartTime: requestData.intervalStart,
@@ -69,7 +63,13 @@ export const sendMetricsToServer = async (forceReset = true): Promise<void> => {
           free: systemData.memoryUsage?.free || 0,
           usagePercent: systemData.memoryUsage?.usagePercent || 0
         },
-        diskUsage: completeDiskUsage,
+        diskUsage: {
+          total: diskUsage.total || 0,
+          used: diskUsage.used || 0,
+          free: diskUsage.free || 0,
+          usagePercent: diskUsage.usagePercent || 0,
+          disks: diskUsage.disks || []
+        },
         loadAverage: systemData.loadAverage || [0, 0, 0],
       }
     };
