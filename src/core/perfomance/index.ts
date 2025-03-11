@@ -9,42 +9,40 @@ declare global {
   var scopeoSyncInterval: NodeJS.Timeout | undefined;
 }
 
-export const scopeoMonitor = {
-  latencyMonitor,
-  requestMonitor,
-  systemMonitor,
-  uptimeMonitor,
-  sendMetricsToServer,
-  startAll: (app?: Application): void => {
-    try {
-      latencyMonitor.startMonitoring();
-      uptimeMonitor.startMonitoring();
-      if (app) {
-        requestMonitor.startMonitoring(app);
-      }
-    } catch (error) {
-      console.error("Error starting monitors:", error);
+export const scopeoMonitor = (app?: Application): void => {
+  try {
+    latencyMonitor.startMonitoring();
+    uptimeMonitor.startMonitoring();
+    systemMonitor.collectMetrics(); 
+    if (app) {
+      requestMonitor.startMonitoring(app);
     }
-  },
-  startWithAutoSync: (app?: Application, interval: number = 60000): void => {
-    scopeoMonitor.startAll(app);
-
-    if (global.scopeoSyncInterval) {
-      clearInterval(global.scopeoSyncInterval);
-    }
-
-    global.scopeoSyncInterval = setInterval(() => {
-      sendMetricsToServer(true);
-    }, interval);
-
-    console.log(
-      `Metrics will be collected and sent every ${interval / 1000} seconds`
-    );
-  },
-  stopAutoSync: (): void => {
-    if (global.scopeoSyncInterval) {
-      clearInterval(global.scopeoSyncInterval);
-      console.log("Automatic metrics sync stopped");
-    }
-  },
+  } catch (error) {
+    console.error("Error starting monitors:", error);
+  }
 };
+
+scopeoMonitor.startWithAutoSync = (app?: Application, interval: number = 60000): void => {
+  scopeoMonitor(app);
+
+  if (global.scopeoSyncInterval) {
+    clearInterval(global.scopeoSyncInterval);
+  }
+
+  global.scopeoSyncInterval = setInterval(() => {
+    sendMetricsToServer(true);
+  }, interval);
+};
+
+scopeoMonitor.stopAutoSync = (): void => {
+  if (global.scopeoSyncInterval) {
+    clearInterval(global.scopeoSyncInterval);
+  }
+};
+
+scopeoMonitor.latencyMonitor = latencyMonitor;
+scopeoMonitor.requestMonitor = requestMonitor;
+scopeoMonitor.systemMonitor = systemMonitor;
+scopeoMonitor.uptimeMonitor = uptimeMonitor;
+scopeoMonitor.sendMetricsToServer = sendMetricsToServer;
+

@@ -103,11 +103,3 @@ export const sendMetricsToServer = async (forceReset = true): Promise<void> => {
     console.error("Error sending metrics to server:", error);
   }
 };
-
-if (global.scopeoSyncInterval) {
-  clearInterval(global.scopeoSyncInterval);
-}
-
-global.scopeoSyncInterval = setInterval(() => {
-  sendMetricsToServer(true);
-}, 60000);
