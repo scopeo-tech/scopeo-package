@@ -20,6 +20,21 @@ export interface SecurityStatusBody {
   isUnusual:boolean
   unusualReason:string | null
 }
+export interface ServerResponse {
+  status: string;
+  message:string
+}
+
+export interface LogsStatusBody {
+  message: string;
+  level: 'info' | 'warning' | 'error';
+  duration: number;
+  method: string;
+  route: string;
+  statusCode: number;
+  statusMessage: string;
+  timestamp: string;
+}
 
 export interface PerformanceData {
   latency: number;

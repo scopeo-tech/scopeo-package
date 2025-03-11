@@ -4,6 +4,7 @@ import { configManager } from "./config/config";
 import { pingMonitor } from "./core/status/index";
 import { logError } from "./utils/logger";
 import { cleanUpMemory } from "./core/security/utils/cleanupMemory";
+export {scopeoRequestLogger} from "./core/activity/index";
 export { scopeoErrorHandler } from "./core/error/index";
 export { scopeoMonitor} from './core/perfomance/index';
 export { accessMonitor } from "./core/security/index";
