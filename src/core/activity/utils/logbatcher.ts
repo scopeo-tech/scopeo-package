@@ -3,13 +3,12 @@ import { sendLogsToServer } from './api';
 import { LogsStatusBody } from '../../../types/types';
 
 const LOG_BATCH_SIZE = 50;
-const LOG_BATCH_INTERVAL = 2 * 60 * 1000; // 2 minutes
+const LOG_BATCH_INTERVAL = 10 * 1000; // 2 minutes
 let logs: LogsStatusBody[] = [];
 
 export const logBatcher = (
     level: 'info' | 'warning' | 'error',
-    message: string,
-    logData: Omit<LogsStatusBody, 'message' | 'level'>
+    logData: Omit<LogsStatusBody, 'level'>
 ): void => {
     if (!logData.route || !logData.method || !logData.statusCode) {
         console.error('Invalid log data:', logData);
@@ -18,7 +17,7 @@ export const logBatcher = (
 
     const logEntry: LogsStatusBody = {
         ...logData,
-        message: message || 'No message provided',
+        message: logData.message || 'No message provided',
         level,
         route: logData.route || 'Unknown route',
         method: logData.method || 'Unknown method',
@@ -30,9 +29,9 @@ export const logBatcher = (
 
     logs.push(logEntry);
 
-    if (level === 'info') logInfo(message);
-    else if (level === 'warning') logWarning(message);
-    else logError(message);
+    if (level === 'info') logInfo(logEntry.message);
+    else if (level === 'warning') logWarning(logEntry.message);
+    else logError(logEntry.message);
 
     if (logs.length >= LOG_BATCH_SIZE) flushLogs();
 };

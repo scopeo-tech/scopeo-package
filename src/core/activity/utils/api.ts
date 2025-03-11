@@ -4,10 +4,9 @@ import { serverConfig } from '../../../utils/serverConfig';
 import { logError } from '../../../utils/logger';
 import axiosErrorManager from '../../../utils/handleAxiosError';
 import { LogsStatusBody } from '../../../types/types';
-import { log } from 'console';
+
 
 export const sendLogsToServer = async (logs:  LogsStatusBody[] ): Promise<void> => {
-    console.log("hello world");
     if (!logs.length) return;
     console.log('Sending logs to server...');
 
