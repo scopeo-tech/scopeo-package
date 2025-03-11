@@ -6,13 +6,20 @@ export function logInfo(message: string) {
 }
 
 export function logError(message: string) {
-  if (configManager.getConfig()?.environment === "production") return;
+  try {
+    const config = configManager.getConfig();
+    if (config?.environment === "production") return;
+  } catch (error) {
+    console.error("\x1b[31mSCOPEO [ERROR]\x1b[0m Failed to get config");
+    console.error(`\x1b[31mSCOPEO [ERROR]\x1b[0m ${message}`);
+    return;
+  }
   console.error(`\x1b[31mSCOPEO [ERROR]\x1b[0m ${message}`);
 }
 
 export const logWarning = (message: string) => {
   if (process.env.NODE_ENV !== "production") {
-    console.warn(`\x1b[33mSCOPEO [WARNING]\x1b[0m ${message}`);
+    console.warn(`\x1b[33mSCOPEO [WARNING]\x1b[0m ${message}`);2
   }
 };
 
