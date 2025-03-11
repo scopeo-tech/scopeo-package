@@ -1,10 +1,6 @@
 import axios, { AxiosError } from "axios";
 
-/**
- * Handles Axios errors and returns  error message.
- * @param err - The error object (unknown type).
- * @returns A formatted error message as a string.
- */
+
 const handleAxiosError = (err: unknown): string => {
   if (axios.isAxiosError(err)) {
     const { response, request, message } = err as AxiosError<{
