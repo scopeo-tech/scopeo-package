@@ -6,6 +6,7 @@ import { logError } from "./utils/logger";
 import { cleanUpMemory } from "./core/security/utils/cleanupMemory";
 export {  scopeoErrorHandler } from "./core/error/index";
 export {accessMonitor} from "./core/security/index";
+export {scopeoRequestLogger} from "./core/activity/index";
 
 const initializeScopeo = () => {
     const config= configManager.getConfig();

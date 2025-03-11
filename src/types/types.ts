@@ -25,3 +25,14 @@ export interface ServerResponse {
   status: string;
   message:string
 }
+
+export interface LogsStatusBody {
+  message: string;
+  level: 'info' | 'warning' | 'error';
+  duration: number;
+  method: string;
+  route: string;
+  statusCode: number;
+  statusMessage: string;
+  timestamp: string;
+}
