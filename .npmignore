@@ -1,7 +1,22 @@
 # Node.js dependencies
 node_modules/
 
-# TypeScript config files 
+# Ignore source files
+src/
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Build artifacts (if already in .gitignore)
+*.log
+*.tsbuildinfo
+
+# TypeScript config files   
 tsconfig.json
 tsup.config.ts
 
+# Editor-specific
+.vscode/
+.idea/

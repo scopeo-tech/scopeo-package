@@ -1,10 +1,15 @@
 {
-  "name": "scopeo_package",
-  "version": "1.0.0",
+  "name": "scopeo",
+  "version": "1.0.1",
   "description": "Scopeo SDK for monitoring Node.js applications.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scopeo-tech/scopeo-package.git"
+  },
+  "homepage": "https://github.com/scopeo-tech/scopeo-package#readme",
   "exports": {
     "import": "./dist/index.mjs",
     "require": "./dist/index.js"
