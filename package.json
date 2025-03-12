@@ -1,6 +1,6 @@
 {
   "name": "scopeo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Scopeo SDK for monitoring Node.js applications.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -41,7 +41,6 @@
     "@types/express": "^5.0.0",
     "axios": "^1.7.9",
     "express": "^4.21.2",
-    "express-rate-limit": "^7.5.0",
-    "scopeo": "file:"
+    "express-rate-limit": "^7.5.0"
   }
 }
