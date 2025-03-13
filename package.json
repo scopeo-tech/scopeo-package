@@ -1,6 +1,6 @@
 {
   "name": "scopeo",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Scopeo SDK for monitoring Node.js applications.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
