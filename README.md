@@ -30,7 +30,9 @@ try {
     configManager.setConfig({
         apiKey: process.env.API_KEY,
         passKey: process.env.PASS_KEY,
-        environment: process.env.ENVIRONMENT
+        environment: process.env.ENVIRONMENT // Set the environment (e.g., 'development' or 'production')
+        
+        // 'development' enables detailed system monitoring data
     });
 } catch (error) {
     console.log(error,"from scopeo package");
