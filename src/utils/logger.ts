@@ -18,7 +18,7 @@ export function logError(message: string) {
 }
 
 export const logWarning = (message: string) => {
-  if (process.env.NODE_ENV !== "production") {
+  if (configManager.getConfig()?.environment === "production") return;{
     console.warn(`\x1b[33mSCOPEO [WARNING]\x1b[0m ${message}`);2
   }
 };
