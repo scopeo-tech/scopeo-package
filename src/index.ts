@@ -2,7 +2,6 @@ export { configManager } from "./config/config";
 export { UserConfig } from "./types/types";
 import { configManager } from "./config/config";
 import { pingMonitor } from "./core/status/index";
-import { logError } from "./utils/logger";
 import { cleanUpMemory } from "./core/security/utils/cleanupMemory";
 import { scopeoMonitor } from "./core/perfomance/index";
 import { Application } from "express";
@@ -13,7 +12,6 @@ export { accessMonitor } from "./core/security/index";
 const initializeScopeo = (app?: Application, autoSyncInterval?: number) => {
   const config = configManager.getConfig();
   if (!config) {
-    logError("Scopeo config is not set");
     throw new Error("Scopeo config is not set");
   }
 

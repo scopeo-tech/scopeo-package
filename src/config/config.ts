@@ -41,7 +41,6 @@ class ConfigManager {
 
   getConfig(): UserConfig {
     if (!this.config) {
-      logError("Scopeo config is not set");
       throw new Error("Scopeo config is not set");
     }
     return this.config;
