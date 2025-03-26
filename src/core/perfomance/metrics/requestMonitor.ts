@@ -1,10 +1,15 @@
 import { performance } from "perf_hooks";
 import { Request, Response, NextFunction, Application } from "express";
+import { logError } from "../../../utils/logger";
 
 declare global {
   var requestMonitorInactivityInterval: NodeJS.Timeout | undefined;
 }
 
+/**
+ * Monitors request performance and tracks key metrics such as response times,
+ * request counts, error rates, and peak requests per second.
+ */
 class RequestMonitor {
   public responseTimes: number[] = [];
   public statusCounts: Record<string, number> = {};
@@ -22,6 +27,11 @@ class RequestMonitor {
   public INACTIVITY_LIMIT = 30 * 60 * 1000;
   public ACTIVITY_CHECK_INTERVAL = 60 * 1000;
 
+  /**
+   * Starts request monitoring.
+   * @param {Application} [app] - The Express application instance.
+   * @returns {boolean} - Returns true if monitoring starts successfully.
+   */
   public startMonitoring = (app?: Application): boolean => {
     if (app) {
       this.setupMiddleware(app);
@@ -33,10 +43,10 @@ class RequestMonitor {
     }
 
     this.setupInactivityChecker();
-
     return true;
   };
 
+  /** Sets up an interval to reset metrics if no activity is detected. */
   public setupInactivityChecker = (): void => {
     if (global.requestMonitorInactivityInterval) {
       clearInterval(global.requestMonitorInactivityInterval);
@@ -45,25 +55,19 @@ class RequestMonitor {
     global.requestMonitorInactivityInterval = setInterval(() => {
       const currentTime = Date.now();
       if (currentTime - this.lastRequestTime > this.INACTIVITY_LIMIT) {
-        console.log(
-          `Inactivity limit of ${
-            this.INACTIVITY_LIMIT / 60000
-          } minutes reached — resetting counters`
-        );
         this.resetCounters();
       }
     }, this.ACTIVITY_CHECK_INTERVAL);
-
-    console.log(
-      `Inactivity checker started (will reset after ${
-        this.INACTIVITY_LIMIT / 60000
-      } minutes of inactivity)`
-    );
   };
 
+  /**
+   * Attaches request tracking middleware to the Express app.
+   * @param {Application} app - The Express application instance.
+   * @returns {boolean} - Returns true if middleware setup succeeds.
+   */
   public setupMiddleware = (app: Application): boolean => {
     if (!app || typeof app.use !== "function") {
-      console.error(
+      logError(
         "Invalid Express app provided to requestMonitor.setupMiddleware"
       );
       return false;
@@ -72,10 +76,12 @@ class RequestMonitor {
     this.app = app;
     app.use(this.trackRequest);
     this.isMonitoring = true;
-    console.log("Request monitoring middleware registered");
     return true;
   };
 
+  /**
+   * Middleware to track request performance and response status.
+   */
   public trackRequest = (
     req: Request,
     res: Response,
@@ -111,6 +117,7 @@ class RequestMonitor {
     next();
   };
 
+  /** Updates the peak requests per second based on recent requests. */
   public updatePeakRequestsPerSecond = (): void => {
     const now = Date.now();
     const recentRequests = this.requestTimestamps.filter(
@@ -124,6 +131,11 @@ class RequestMonitor {
     );
   };
 
+  /**
+   * Collects request performance metrics.
+   * @param {boolean} [resetAfterCollection=false] - Whether to reset metrics after collection.
+   * @returns {object} - The collected metrics.
+   */
   public collectMetrics = (
     resetAfterCollection: boolean = false
   ): {
@@ -187,6 +199,7 @@ class RequestMonitor {
     return metrics;
   };
 
+  /** Resets all collected metrics and starts a new monitoring interval. */
   public resetCounters = (): void => {
     this.responseTimes = [];
     this.statusCounts = {};
@@ -197,24 +210,19 @@ class RequestMonitor {
     this.pathCounts = {};
     this.peakRequestsPerSecond = 0;
     this.intervalStart = Date.now();
-
-    console.log(
-      `RequestMonitor counters reset at ${new Date(
-        this.intervalStart
-      ).toISOString()}`
-    );
   };
 
+  /** Checks if request monitoring is active. */
   public isActive = (): boolean => {
     return this.isMonitoring;
   };
 
+  /** Stops request monitoring and clears inactivity interval. */
   public stopMonitoring = (): void => {
     if (global.requestMonitorInactivityInterval) {
       clearInterval(global.requestMonitorInactivityInterval);
     }
     this.isMonitoring = false;
-    console.log("Request monitoring stopped");
   };
 }
 

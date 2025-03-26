@@ -9,11 +9,15 @@ declare global {
   var scopeoSyncInterval: NodeJS.Timeout | undefined;
 }
 
+/**
+ * Initializes and starts various monitoring services.
+ * @param {Application} [app] - Optional Express application instance to monitor requests.
+ */
 export const scopeoMonitor = (app?: Application): void => {
   try {
     latencyMonitor.startMonitoring();
     uptimeMonitor.startMonitoring();
-    systemMonitor.collectMetrics(); 
+    systemMonitor.collectMetrics();
     if (app) {
       requestMonitor.startMonitoring(app);
     }
@@ -22,7 +26,15 @@ export const scopeoMonitor = (app?: Application): void => {
   }
 };
 
-scopeoMonitor.startWithAutoSync = (app?: Application, interval: number = 60000): void => {
+/**
+ * Starts monitoring with automatic periodic synchronization of collected metrics.
+ * @param {Application} [app] - Optional Express application instance to monitor requests.
+ * @param {number} [interval=60000] - Interval in milliseconds for sending metrics.
+ */
+scopeoMonitor.startWithAutoSync = (
+  app?: Application,
+  interval: number = 60000
+): void => {
   scopeoMonitor(app);
 
   if (global.scopeoSyncInterval) {
@@ -34,15 +46,18 @@ scopeoMonitor.startWithAutoSync = (app?: Application, interval: number = 60000):
   }, interval);
 };
 
+/**
+ * Stops the automatic synchronization of collected metrics.
+ */
 scopeoMonitor.stopAutoSync = (): void => {
   if (global.scopeoSyncInterval) {
     clearInterval(global.scopeoSyncInterval);
   }
 };
 
+/** Monitoring modules attached to scopeoMonitor for external usage. */
 scopeoMonitor.latencyMonitor = latencyMonitor;
 scopeoMonitor.requestMonitor = requestMonitor;
 scopeoMonitor.systemMonitor = systemMonitor;
 scopeoMonitor.uptimeMonitor = uptimeMonitor;
 scopeoMonitor.sendMetricsToServer = sendMetricsToServer;
-
