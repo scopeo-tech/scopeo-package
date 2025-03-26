@@ -6,8 +6,14 @@ class UptimeMonitor {
   public isServerUp: boolean = true;
   public lastResetTime: number = Date.now();
 
+  /**
+   * @param {number} monitorInterval - Interval in milliseconds to check uptime.
+   */
   constructor(public readonly monitorInterval: number = 5000) {}
 
+  /**
+   * Starts the uptime monitoring process at the defined interval.
+   */
   public startMonitoring = () => {
     if (this.intervalId) return;
 
@@ -16,6 +22,9 @@ class UptimeMonitor {
     }, this.monitorInterval);
   };
 
+  /**
+   * Stops the uptime monitoring process.
+   */
   public stopMonitoring = () => {
     if (this.intervalId) {
       clearInterval(this.intervalId);
@@ -23,6 +32,9 @@ class UptimeMonitor {
     }
   };
 
+  /**
+   * Checks and updates uptime/downtime statistics based on server status.
+   */
   public checkUptime = () => {
     const currentTime = Date.now();
     const elapsedTime = currentTime - this.lastCheckTime;
@@ -43,6 +55,10 @@ class UptimeMonitor {
     this.collectUptimeData(uptimePercentage);
   };
 
+  /**
+   * Determines if a new day has started based on a 24-hour cycle.
+   * @returns {boolean} True if a new day has started, false otherwise.
+   */
   public isNewDay = () => {
     const currentTime = Date.now();
     const oneDayInMs = 24 * 60 * 60 * 1000;
@@ -50,12 +66,19 @@ class UptimeMonitor {
     return currentTime - this.lastResetTime >= oneDayInMs;
   };
 
+  /**
+   * Resets uptime and downtime counters at the start of a new day.
+   */
   public resetCounters = () => {
     this.lastResetTime = Date.now();
     this.uptimeTime = 0;
     this.downtimeTime = 0;
   };
 
+  /**
+   * Calculates the server uptime percentage based on recorded time.
+   * @returns {number} The uptime percentage.
+   */
   public calculateUptimePercentage = () => {
     const totalTime = this.uptimeTime + this.downtimeTime;
     if (totalTime === 0) return 100;
@@ -63,6 +86,11 @@ class UptimeMonitor {
     return (this.uptimeTime / totalTime) * 100;
   };
 
+  /**
+   * Collects and returns uptime statistics.
+   * @param {number} uptimePercentage - The calculated uptime percentage.
+   * @returns {{ uptimePercentage: number }} The uptime data.
+   */
   public collectUptimeData = (uptimePercentage: number) => {
     return {
       uptimePercentage: uptimePercentage,

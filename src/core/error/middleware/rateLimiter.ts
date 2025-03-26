@@ -1,7 +1,7 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit from "express-rate-limit";
 
 export const errorRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
+  windowMs: 15 * 60 * 1000,
   max: 100,
-  message: 'Too many error logs, please try again later',
+  message: "Too many error logs, please try again later",
 });

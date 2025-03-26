@@ -23,6 +23,14 @@ class MetricsService {
   private lastMetricsSentTime = 0;
   private isCurrentlySending = false;
 
+  /**
+   * Sends performance metrics to the server with retry logic and error handling.
+   *
+   * @param {boolean} [forceReset=true] - Whether to reset latency and request counters after sending.
+   * @param {number} [maxRetries=3] - Maximum number of retry attempts for failed requests.
+   * @param {number} [retryDelay=2000] - Delay (in milliseconds) between retry attempts.
+   * @returns {Promise<void>}
+   */
   public async sendMetricsToServer(
     forceReset = true,
     maxRetries = 3,
@@ -33,7 +41,6 @@ class MetricsService {
     }
 
     this.isCurrentlySending = true;
-
     let payload: MetricsPayload | undefined;
 
     try {
@@ -65,14 +72,6 @@ class MetricsService {
         uptimeMonitor.calculateUptimePercentage()
       ) as UptimeData;
 
-      const diskUsage = systemData.diskUsage || {
-        disks: [],
-        total: 0,
-        used: 0,
-        free: 0,
-        usagePercent: 0,
-      };
-
       payload = {
         timeStamp: currentTime,
         batchStartTime: requestData.intervalStart,
@@ -91,20 +90,9 @@ class MetricsService {
         },
         systemUsage: {
           cpuUsage: systemData.cpuUsage || [],
-          memoryUsage: {
-            total: systemData.memoryUsage?.total || 0,
-            used: systemData.memoryUsage?.used || 0,
-            free: systemData.memoryUsage?.free || 0,
-            usagePercent: systemData.memoryUsage?.usagePercent || 0,
-          },
-          diskUsage: {
-            total: diskUsage.total || 0,
-            used: diskUsage.used || 0,
-            free: diskUsage.free || 0,
-            usagePercent: diskUsage.usagePercent || 0,
-            disks: diskUsage.disks || [],
-          },
-          loadAverage: systemData.loadAverage || [0, 0, 0],
+          memoryUsage: systemData.memoryUsage,
+          diskUsage: systemData.diskUsage,
+          loadAverage: systemData.loadAverage,
         },
       };
 
@@ -114,7 +102,6 @@ class MetricsService {
         maxRetries,
         retryDelay
       );
-
       await this.sendWithRetry(
         payload,
         config.apiKey,
@@ -124,17 +111,16 @@ class MetricsService {
       );
 
       this.lastMetricsSentTime = currentTime;
+
       if (forceReset) {
         latencyMonitor.collectLatencyData(1);
         requestMonitor.resetCounters();
       }
     } catch (error) {
       console.error("Error sending metrics to server:", error);
-
       if (typeof error === "object" && error !== null && payload) {
         this.handleSendingError(error, payload);
       }
-
       if (forceReset) {
         latencyMonitor.collectLatencyData(1);
         requestMonitor.resetCounters();
@@ -144,17 +130,19 @@ class MetricsService {
     }
   }
 
+  /**
+   * Handles errors that occur when sending metrics.
+   *
+   * @param {unknown} error - The encountered error.
+   * @param {MetricsPayload} payload - The metrics payload that failed to send.
+   */
   private handleSendingError(error: unknown, payload: MetricsPayload): void {
-    const errorObj = error as Error & {
-      code?: string;
-      message: string;
-    };
+    const errorObj = error as Error & { code?: string; message: string };
 
     if (
-      errorObj.code === "ECONNRESET" ||
-      errorObj.code === "ECONNREFUSED" ||
-      errorObj.code === "ETIMEDOUT" ||
-      errorObj.code === "ENETUNREACH" ||
+      ["ECONNRESET", "ECONNREFUSED", "ETIMEDOUT", "ENETUNREACH"].includes(
+        errorObj.code || ""
+      ) ||
       errorObj.message?.includes("network") ||
       errorObj.message?.includes("timeout")
     ) {
@@ -166,6 +154,15 @@ class MetricsService {
     }
   }
 
+  /**
+   * Attempts to send any pending metrics that failed previously.
+   *
+   * @param {string} apiKey - API key for authentication.
+   * @param {string} passKey - Pass key for authentication.
+   * @param {number} maxRetries - Maximum number of retries for failed requests.
+   * @param {number} retryDelay - Delay (in milliseconds) between retries.
+   * @returns {Promise<void>}
+   */
   private async sendPendingMetrics(
     apiKey: string,
     passKey: string,
@@ -183,15 +180,24 @@ class MetricsService {
           maxRetries,
           retryDelay
         );
-
         this.pendingMetrics.shift();
       } catch (error) {
         pendingSuccess = false;
-        console.error("Failed to send pending metrics, will try again later");
+        logError("Failed to send pending metrics, will try again later");
       }
     }
   }
 
+  /**
+   * Sends a metrics payload with retry logic.
+   *
+   * @param {MetricsPayload} payload - The metrics data to send.
+   * @param {string} apiKey - API key for authentication.
+   * @param {string} passKey - Pass key for authentication.
+   * @param {number} maxRetries - Maximum number of retries for failed requests.
+   * @param {number} retryDelay - Delay (in milliseconds) between retries.
+   * @returns {Promise<void>}
+   */
   private async sendWithRetry(
     payload: MetricsPayload,
     apiKey: string,
@@ -211,7 +217,6 @@ class MetricsService {
           },
           timeout: 10000,
         });
-
         return;
       } catch (error) {
         attempts++;
@@ -219,8 +224,8 @@ class MetricsService {
         if (attempts > maxRetries) {
           throw error;
         }
-        const waitTime = retryDelay * Math.pow(2, attempts - 1);
 
+        const waitTime = retryDelay * Math.pow(2, attempts - 1);
         await new Promise((resolve) => setTimeout(resolve, waitTime));
       }
     }
@@ -229,6 +234,14 @@ class MetricsService {
 
 export const metricsService = new MetricsService();
 
+/**
+ * Sends metrics to the server through the MetricsService instance.
+ *
+ * @param {boolean} [forceReset=true] - Whether to reset counters after sending.
+ * @param {number} [maxRetries=3] - Maximum number of retry attempts.
+ * @param {number} [retryDelay=2000] - Delay (in milliseconds) between retries.
+ * @returns {Promise<void>}
+ */
 export const sendMetricsToServer = async (
   forceReset = true,
   maxRetries = 3,

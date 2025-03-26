@@ -3,6 +3,11 @@ import { sendSecurityData } from "../utils/api";
 import { detectBruteForce } from "../utils/detectBruteForce";
 import { detectUnusualLogin } from "../utils/detectUnusualLogin";
 
+/**
+ * Tracks access attempts and detects security threats.
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object.
+ */
 export const trackAccess = (req: Request, res: Response) => {
   const start = Date.now();
 
@@ -28,4 +33,3 @@ export const trackAccess = (req: Request, res: Response) => {
     });
   });
 };
-
