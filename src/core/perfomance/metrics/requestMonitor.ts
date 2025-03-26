@@ -45,20 +45,9 @@ class RequestMonitor {
     global.requestMonitorInactivityInterval = setInterval(() => {
       const currentTime = Date.now();
       if (currentTime - this.lastRequestTime > this.INACTIVITY_LIMIT) {
-        console.log(
-          `Inactivity limit of ${
-            this.INACTIVITY_LIMIT / 60000
-          } minutes reached — resetting counters`
-        );
         this.resetCounters();
       }
     }, this.ACTIVITY_CHECK_INTERVAL);
-
-    console.log(
-      `Inactivity checker started (will reset after ${
-        this.INACTIVITY_LIMIT / 60000
-      } minutes of inactivity)`
-    );
   };
 
   public setupMiddleware = (app: Application): boolean => {
@@ -72,7 +61,6 @@ class RequestMonitor {
     this.app = app;
     app.use(this.trackRequest);
     this.isMonitoring = true;
-    console.log("Request monitoring middleware registered");
     return true;
   };
 
@@ -197,12 +185,6 @@ class RequestMonitor {
     this.pathCounts = {};
     this.peakRequestsPerSecond = 0;
     this.intervalStart = Date.now();
-
-    console.log(
-      `RequestMonitor counters reset at ${new Date(
-        this.intervalStart
-      ).toISOString()}`
-    );
   };
 
   public isActive = (): boolean => {
@@ -214,7 +196,6 @@ class RequestMonitor {
       clearInterval(global.requestMonitorInactivityInterval);
     }
     this.isMonitoring = false;
-    console.log("Request monitoring stopped");
   };
 }
 

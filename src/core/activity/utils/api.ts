@@ -7,10 +7,7 @@ import { LogsStatusBody } from '../../../types/types';
 import { log } from 'console';
 
 export const sendLogsToServer = async (logs:  LogsStatusBody[] ): Promise<void> => {
-    console.log("hello world");
     if (!logs.length) return;
-    console.log('Sending logs to server...');
-
     try {
         const config = configManager.getConfig();
         if (!config) {
@@ -29,7 +26,6 @@ export const sendLogsToServer = async (logs:  LogsStatusBody[] ): Promise<void> 
             }
        
         );
-         console.log('Logs sent successfully');
     } catch (error) {
         logError(`Failed to send logs: ${axiosErrorManager(error)}`);
     }
