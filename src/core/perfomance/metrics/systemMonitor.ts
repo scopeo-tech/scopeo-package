@@ -3,6 +3,11 @@ import { logInfo, logError } from "../../../utils/logger";
 import { configManager } from "../../../config/config";
 
 class SystemMonitor {
+  /**
+   * Collects system metrics including CPU, memory, disk usage, and uptime.
+   * Skips monitoring in production mode.
+   * @returns {Promise<object | null>} System metrics or null if skipped.
+   */
   public async collectMetrics() {
     try {
       const config = configManager.getConfig();
@@ -18,34 +23,38 @@ class SystemMonitor {
       const diskUsage = await this.getDiskUsage();
       const loadAverage = os.loadavg();
 
-      const metrics = {
+      return {
         uptime,
         cpuUsage,
         memoryUsage,
         diskUsage,
         loadAverage,
       };
-
-      return metrics;
     } catch (error) {
       logError(`Error collecting system metrics: ${error}`);
       return null;
     }
   }
 
+  /**
+   * Retrieves CPU usage percentages for each core.
+   * @returns {number[]} CPU usage per core in percentage.
+   */
   public getCpuUsage() {
     const cpus = os.cpus();
-    const cpuLoad = cpus.map((cpu) => {
+    return cpus.map((cpu) => {
       const total = Object.values(cpu.times).reduce(
         (acc, time) => acc + time,
         0
       );
-      const usage = (total - cpu.times.idle) / total;
-      return usage * 100;
+      return ((total - cpu.times.idle) / total) * 100;
     });
-    return cpuLoad;
   }
 
+  /**
+   * Retrieves memory usage details.
+   * @returns {object} Memory usage statistics.
+   */
   public getMemoryUsage() {
     const totalMem = os.totalmem();
     const freeMem = os.freemem();
@@ -58,27 +67,25 @@ class SystemMonitor {
     };
   }
 
+  /**
+   * Retrieves disk usage based on the operating system.
+   * @returns {Promise<object>} Disk usage details.
+   */
   public async getDiskUsage() {
     try {
-      const platform = os.platform();
-
-      if (platform === "win32") {
-        return await this.getWindowsDiskUsage();
-      } else {
-        return await this.getUnixDiskUsage();
-      }
+      return os.platform() === "win32"
+        ? await this.getWindowsDiskUsage()
+        : await this.getUnixDiskUsage();
     } catch (error) {
       logError("Error getting disk usage: " + error);
-      return {
-        disks: [],
-        total: 0,
-        used: 0,
-        free: 0,
-        usagePercent: 0,
-      };
+      return this.getFallbackDiskInfo();
     }
   }
 
+  /**
+   * Retrieves disk usage on Windows systems.
+   * @returns {Promise<object>} Windows disk usage details.
+   */
   public async getWindowsDiskUsage() {
     try {
       const { execSync } = await import("child_process");
@@ -96,40 +103,33 @@ class SystemMonitor {
           const parts = line.trim().split(/\s+/);
           if (parts.length >= 3) {
             const deviceId = parts[0];
-            if (parts[parts.length - 2] && parts[parts.length - 1]) {
-              const freeSpace = parseInt(parts[parts.length - 2]);
-              const size = parseInt(parts[parts.length - 1]);
+            const freeSpace = parseInt(parts[parts.length - 2]);
+            const size = parseInt(parts[parts.length - 1]);
 
-              if (!isNaN(freeSpace) && !isNaN(size) && size > 0) {
-                const used = size - freeSpace;
-                const usagePercent = (used / size) * 100;
+            if (!isNaN(freeSpace) && !isNaN(size) && size > 0) {
+              const used = size - freeSpace;
+              disks.push({
+                drive: deviceId,
+                total: size,
+                used,
+                free: freeSpace,
+                usagePercent: (used / size) * 100,
+              });
 
-                disks.push({
-                  drive: deviceId,
-                  total: size,
-                  used: used,
-                  free: freeSpace,
-                  usagePercent: usagePercent,
-                });
-
-                totalSize += size;
-                totalFree += freeSpace;
-              }
+              totalSize += size;
+              totalFree += freeSpace;
             }
           }
         }
       }
 
-      const totalUsed = totalSize - totalFree;
-      const totalUsagePercent =
-        totalSize > 0 ? (totalUsed / totalSize) * 100 : 0;
-
       return {
         disks,
         total: totalSize,
-        used: totalUsed,
+        used: totalSize - totalFree,
         free: totalFree,
-        usagePercent: totalUsagePercent,
+        usagePercent:
+          totalSize > 0 ? ((totalSize - totalFree) / totalSize) * 100 : 0,
       };
     } catch (error) {
       logError("Error getting Windows disk usage: " + error);
@@ -137,6 +137,10 @@ class SystemMonitor {
     }
   }
 
+  /**
+   * Retrieves disk usage on Unix-based systems.
+   * @returns {Promise<object>} Unix disk usage details.
+   */
   public async getUnixDiskUsage() {
     try {
       const { execSync } = await import("child_process");
@@ -173,16 +177,13 @@ class SystemMonitor {
         }
       }
 
-      const totalUsed = totalSize - totalFree;
-      const totalUsagePercent =
-        totalSize > 0 ? (totalUsed / totalSize) * 100 : 0;
-
       return {
         disks,
         total: totalSize,
-        used: totalUsed,
+        used: totalSize - totalFree,
         free: totalFree,
-        usagePercent: totalUsagePercent,
+        usagePercent:
+          totalSize > 0 ? ((totalSize - totalFree) / totalSize) * 100 : 0,
       };
     } catch (error) {
       logError("Error getting Unix disk usage: " + error);
@@ -190,6 +191,10 @@ class SystemMonitor {
     }
   }
 
+  /**
+   * Provides fallback disk usage data when retrieval fails.
+   * @returns {object} Empty disk usage statistics.
+   */
   public getFallbackDiskInfo() {
     return {
       disks: [],

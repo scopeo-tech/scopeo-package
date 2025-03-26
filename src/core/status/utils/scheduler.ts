@@ -2,11 +2,13 @@ import { logInfo } from "../../../utils/logger";
 import { sendPing } from "./api";
 import { pingConfig } from "./config";
 
-let pingInterval : NodeJS.Timer | null = null;
+let pingInterval: NodeJS.Timer | null = null;
 
+/**
+ * Starts a scheduler to send periodic ping requests.
+ */
 export function startPingScheduler(): void {
-    if (pingInterval) return;
-    pingInterval = setInterval(sendPing, pingConfig.interval);
-    logInfo("Ping scheduler started");
+  if (pingInterval) return;
+  pingInterval = setInterval(sendPing, pingConfig.interval);
+  logInfo("Ping scheduler started");
 }
-
